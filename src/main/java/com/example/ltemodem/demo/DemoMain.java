@@ -18,5 +18,19 @@ public class DemoMain {
         Thread.sleep(15000);
         ppp.stopPPP();
         modem.disconnect();
+modem.connect("/dev/ttyUSB2", 115200);
+LteModemApi api = new LteModemApi(modem);
+PdpContextManager pdpMgr = new PdpContextManager(api, modem);
+
+pdpMgr.attachAsync("internet", 5000)
+      .thenAccept(ok -> System.out.println("Attached: " + ok))
+      .exceptionally(ex -> {
+          System.err.println("Attach failed: " + ex.getMessage());
+          return null;
+      });
+
+Thread.sleep(6000);
+pdpMgr.shutdown();
+modem.disconnect();
     }
 }
