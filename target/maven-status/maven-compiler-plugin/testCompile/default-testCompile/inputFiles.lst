@@ -1,3 +1,7 @@
 /home/amin/Developments/StartHere/NewDeviceLibs/Modem/lte-modem-lib/src/test/java/com/example/ltemodem/mock/MockSerialPort.java
+/home/amin/Developments/StartHere/NewDeviceLibs/Modem/lte-modem-lib/src/test/java/com/example/ltemodem/PdpContextManagerRetryTest.java
 /home/amin/Developments/StartHere/NewDeviceLibs/Modem/lte-modem-lib/src/test/java/com/example/ltemodem/PdpContextManagerTest.java
+/home/amin/Developments/StartHere/NewDeviceLibs/Modem/lte-modem-lib/src/test/java/com/example/ltemodem/IntegrationSerialStressTest.java
 /home/amin/Developments/StartHere/NewDeviceLibs/Modem/lte-modem-lib/src/test/java/com/example/ltemodem/LteModemManagerTest.java
+/home/amin/Developments/StartHere/NewDeviceLibs/Modem/lte-modem-lib/src/test/java/com/example/ltemodem/ReactiveDispatcherStressTest.java
+/home/amin/Developments/StartHere/NewDeviceLibs/Modem/lte-modem-lib/src/test/java/com/example/ltemodem/pdp/TestHelpers.java

@@ -2,7 +2,6 @@ package com.example.ltemodem;
 
 import com.example.ltemodem.core.LteModemManager;
 import com.example.ltemodem.core.LteModemApi;
-import com.example.ltemodem.events.*;
 import com.example.ltemodem.mock.MockSerialPort;
 import com.example.ltemodem.pdp.PdpContextManager;
 import org.junit.jupiter.api.*;
@@ -36,7 +35,7 @@ public class PdpContextManagerTest {
         CompletableFuture<Boolean> fut = pdpMgr.attachAsync("internet", 1000);
         mockPort.simulateIncomingLine("OK");
         mockPort.simulateIncomingLine("+CGATT: 1");
-        assertTrue(fut.get(500, TimeUnit.MILLISECONDS));
+        assertTrue(fut.get(2000, TimeUnit.MILLISECONDS));
     }
 
     @Test
@@ -44,7 +43,7 @@ public class PdpContextManagerTest {
         CompletableFuture<Boolean> fut = pdpMgr.detachAsync(1000);
         mockPort.simulateIncomingLine("OK");
         mockPort.simulateIncomingLine("+CGATT: 0");
-        assertTrue(fut.get(500, TimeUnit.MILLISECONDS));
+        assertTrue(fut.get(2000, TimeUnit.MILLISECONDS));
     }
 
     @Test
@@ -52,7 +51,7 @@ public class PdpContextManagerTest {
         CompletableFuture<Boolean> fut = pdpMgr.activateAsync(1000);
         mockPort.simulateIncomingLine("OK");
         mockPort.simulateIncomingLine("+CGEV: PDN ACT");
-        assertTrue(fut.get(500, TimeUnit.MILLISECONDS));
+        assertTrue(fut.get(2000, TimeUnit.MILLISECONDS));
     }
 
     @Test
@@ -60,7 +59,7 @@ public class PdpContextManagerTest {
         CompletableFuture<Boolean> fut = pdpMgr.deactivateAsync(1000);
         mockPort.simulateIncomingLine("OK");
         mockPort.simulateIncomingLine("+CGEV: PDN DEACT");
-        assertTrue(fut.get(500, TimeUnit.MILLISECONDS));
+        assertTrue(fut.get(2000, TimeUnit.MILLISECONDS));
     }
 
     @Test

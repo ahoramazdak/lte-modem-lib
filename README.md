@@ -12,7 +12,8 @@ Java library for managing LTE modem PDP contexts via AT commands.
 - ✅ Retry logic with exponential backoff
 - ✅ GitHub Actions CI
 
-## Getting Started
-
-```bash
+## Build
 mvn clean install
+
+## Run Demo
+mvn exec:java -Dexec.mainClass="com.example.ltemodem.demo.DemoMain"

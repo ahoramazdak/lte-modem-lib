@@ -1,2 +1,5 @@
 package com.example.ltemodem.events;
-public abstract class ModemEvent {}
+
+public abstract class ModemEvent {
+
+}
