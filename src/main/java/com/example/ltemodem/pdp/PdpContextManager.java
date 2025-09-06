@@ -15,13 +15,14 @@ public class PdpContextManager {
     private final LteModemApi api;
     private final LteModemManager manager;
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-
+    private String apn;
     public PdpContextManager(LteModemApi api, LteModemManager manager) {
         this.api = api;
         this.manager = manager;
     }
 
     public CompletableFuture<Boolean> attachAsync(String apn, long timeoutMs) {
+        this.apn=apn;
         return withRetry(() -> api.attachPdpContext(apn), 3, 500)
                 .thenCompose(ok -> sendAndAwaitPdp(true, () -> true, timeoutMs, PdpEvent::isAttached));
         
@@ -29,16 +30,22 @@ public class PdpContextManager {
     }
 
     public CompletableFuture<Boolean> detachAsync(long timeoutMs) {
-        return sendAndAwaitPdp(false, api::detachPdpContext, timeoutMs, pdp -> !pdp.isAttached());
+        return withRetry(() -> api.detachPdpContext(), 3, 500)
+                .thenCompose(ok -> sendAndAwaitPdp(true, () -> true, timeoutMs, pdp -> !pdp.isAttached()));
+//        return sendAndAwaitPdp(false, api::detachPdpContext, timeoutMs, pdp -> !pdp.isAttached());
     }
 
-//    public CompletableFuture<Boolean> activateAsync(long timeoutMs) {
+    public CompletableFuture<Boolean> activateAsync(long timeoutMs) {
+        return withRetry(() -> api.activatePdpContext(), 3, 500)
+                .thenCompose(ok -> sendAndAwaitPdp(true, () -> true, timeoutMs, pdp -> pdp.isActivated()));
 //        return sendAndAwaitPdp(true, api::activatePdpContext, timeoutMs, pdp -> pdp.isActivated());
-//    }
-//
-//    public CompletableFuture<Boolean> deactivateAsync(long timeoutMs) {
+    }
+
+    public CompletableFuture<Boolean> deactivateAsync(long timeoutMs) {
+        return withRetry(() -> api.detachPdpContext(), 3, 500)
+                .thenCompose(ok -> sendAndAwaitPdp(true, () -> true, timeoutMs, PdpEvent::isAttached));
 //        return sendAndAwaitPdp(false, api::deactivatePdpContext, timeoutMs, pdp -> !pdp.isActivated());
-//    }
+    }
     private <T> CompletableFuture<T> withRetry(Callable<T> task, int maxRetries, long delayMs) {
         CompletableFuture<T> future = new CompletableFuture<>();
         Executors.newSingleThreadExecutor().submit(() -> {

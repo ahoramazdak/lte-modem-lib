@@ -93,10 +93,10 @@ public class LteModemManager {
     }
 
     private void handlePdpEvents(String line){
-        if(line.startsWith("+CGATT:")) dispatchEvent(new PdpEvent(line.contains("1")));
+        if(line.startsWith("+CGATT:")) dispatchEvent(new PdpEvent(line.contains("1"),true));
         else if(line.startsWith("+CGEV:")){
-            if(line.contains("PDN ACT")) dispatchEvent(new PdpEvent(true));
-            else if(line.contains("PDN DEACT")) dispatchEvent(new PdpEvent(false));
+            if(line.contains("PDN ACT")) dispatchEvent(new PdpEvent(true,true));
+            else if(line.contains("PDN DEACT")) dispatchEvent(new PdpEvent(true,false));
         }
     }
 
