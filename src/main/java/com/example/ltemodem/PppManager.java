@@ -1,5 +1,6 @@
 package com.example.ltemodem;
 
+import com.example.ltemodem.core.LteModemApi;
 import java.io.*;
 import java.util.concurrent.*;
 

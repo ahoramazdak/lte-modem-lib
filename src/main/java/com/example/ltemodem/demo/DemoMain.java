@@ -1,5 +1,8 @@
 package com.example.ltemodem.demo;
+import com.example.ltemodem.core.LteModemManager;
+import com.example.ltemodem.core.LteModemApi;
 import com.example.ltemodem.*;
+import com.example.ltemodem.pdp.PdpContextManager;
 public class DemoMain {
     public static void main(String[] args) throws Exception{
         LteModemManager modem=new LteModemManager();
@@ -19,7 +22,6 @@ public class DemoMain {
         ppp.stopPPP();
         modem.disconnect();
 modem.connect("/dev/ttyUSB2", 115200);
-LteModemApi api = new LteModemApi(modem);
 PdpContextManager pdpMgr = new PdpContextManager(api, modem);
 
 pdpMgr.attachAsync("internet", 5000)

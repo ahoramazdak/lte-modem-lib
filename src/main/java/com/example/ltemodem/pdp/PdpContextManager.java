@@ -1,6 +1,8 @@
 
 package com.example.ltemodem.pdp;
 
+import com.example.ltemodem.core.LteModemManager;
+import com.example.ltemodem.core.LteModemApi;
 import com.example.ltemodem.*;
 import com.example.ltemodem.events.*;
 
@@ -20,19 +22,43 @@ public class PdpContextManager {
     }
 
     public CompletableFuture<Boolean> attachAsync(String apn, long timeoutMs) {
-        return sendAndAwaitPdp(true, () -> api.attachPdpContext(apn), timeoutMs, PdpEvent::isAttached);
+        return withRetry(() -> api.attachPdpContext(apn), 3, 500)
+                .thenCompose(ok -> sendAndAwaitPdp(true, () -> true, timeoutMs, PdpEvent::isAttached));
+        
+//        return sendAndAwaitPdp(true, () -> api.attachPdpContext(apn), timeoutMs, PdpEvent::isAttached);
     }
 
     public CompletableFuture<Boolean> detachAsync(long timeoutMs) {
         return sendAndAwaitPdp(false, api::detachPdpContext, timeoutMs, pdp -> !pdp.isAttached());
     }
 
-    public CompletableFuture<Boolean> activateAsync(long timeoutMs) {
-        return sendAndAwaitPdp(true, api::activatePdpContext, timeoutMs, pdp -> pdp.isActivated());
-    }
-
-    public CompletableFuture<Boolean> deactivateAsync(long timeoutMs) {
-        return sendAndAwaitPdp(false, api::deactivatePdpContext, timeoutMs, pdp -> !pdp.isActivated());
+//    public CompletableFuture<Boolean> activateAsync(long timeoutMs) {
+//        return sendAndAwaitPdp(true, api::activatePdpContext, timeoutMs, pdp -> pdp.isActivated());
+//    }
+//
+//    public CompletableFuture<Boolean> deactivateAsync(long timeoutMs) {
+//        return sendAndAwaitPdp(false, api::deactivatePdpContext, timeoutMs, pdp -> !pdp.isActivated());
+//    }
+    private <T> CompletableFuture<T> withRetry(Callable<T> task, int maxRetries, long delayMs) {
+        CompletableFuture<T> future = new CompletableFuture<>();
+        Executors.newSingleThreadExecutor().submit(() -> {
+            for (int i = 0; i < maxRetries; i++) {
+                try {
+                    future.complete(task.call());
+                    return;
+                } catch (Exception e) {
+                    if (i == maxRetries - 1) {
+                        future.completeExceptionally(e);
+                    } else {
+                        try {
+                            Thread.sleep(delayMs * (1 << i)); // exponential backoff
+                        } catch (InterruptedException ignored) {
+                        }
+                    }
+                }
+            }
+        });
+        return future;
     }
 
     private CompletableFuture<Boolean> sendAndAwaitPdp(

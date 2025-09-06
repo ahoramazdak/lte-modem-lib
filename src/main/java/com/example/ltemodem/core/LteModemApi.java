@@ -1,4 +1,4 @@
-package com.example.ltemodem;
+package com.example.ltemodem.core;
 
 import java.util.regex.*;
 import com.example.ltemodem.events.*;

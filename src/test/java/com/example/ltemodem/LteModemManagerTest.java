@@ -1,4 +1,5 @@
 package com.example.ltemodem;
+import com.example.ltemodem.core.LteModemManager;
 import com.example.ltemodem.events.*;
 import com.example.ltemodem.mock.MockSerialPort;
 import org.junit.jupiter.api.*;

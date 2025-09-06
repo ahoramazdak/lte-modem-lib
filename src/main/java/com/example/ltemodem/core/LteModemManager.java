@@ -1,10 +1,13 @@
-package com.example.ltemodem;
+package com.example.ltemodem.core;
 
 import com.example.ltemodem.events.*;
 import com.fazecast.jSerialComm.SerialPort;
 import java.io.*;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.regex.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LteModemManager {
     private SerialPort serialPort;
@@ -12,9 +15,10 @@ public class LteModemManager {
     private OutputStream out;
     private volatile boolean running = false;
     private Thread readerThread;
-    private final List<ModemEventListener> listeners = new ArrayList<>();
+//    private final List<ModemEventListener> listeners = new ArrayList<>();
+    private EventDispatcher dispatcher=new EventDispatcher();
     private final StringBuilder responseBuffer = new StringBuilder();
-
+    private static final Logger log = LoggerFactory.getLogger(LteModemManager.class);
     public LteModemManager() {}
     public LteModemManager(InputStream in, OutputStream out) {
         this.in = in; this.out = out;
@@ -28,7 +32,8 @@ public class LteModemManager {
         serialPort.setNumDataBits(8);
         serialPort.setNumStopBits(SerialPort.ONE_STOP_BIT);
         serialPort.setParity(SerialPort.NO_PARITY);
-        if (!serialPort.openPort()) { System.err.println("Failed to open port "+portName); return false; }
+        if (!serialPort.openPort()) { 
+            log.error("Failed to open port "+portName); return false; }
         in = serialPort.getInputStream();
         out = serialPort.getOutputStream();
         startReaderThread();
@@ -37,8 +42,10 @@ public class LteModemManager {
 
     public void disconnect() { running=false; try{Thread.sleep(100);}catch(Exception ignored){} if(serialPort!=null && serialPort.isOpen()) serialPort.closePort(); }
 
-    public void addListener(ModemEventListener listener) { listeners.add(listener); }
-    public void removeListener(ModemEventListener listener) { listeners.remove(listener); }
+    public void addListener(ModemEventListener listener) { dispatcher.addListener((Consumer<ModemEvent>) listener); }
+    public void removeListener(ModemEventListener listener) { 
+        dispatcher.removeListener((Consumer<ModemEvent>) listener);
+    }
 
     public void sendCommand(String cmd) throws IOException { out.write((cmd+"\r").getBytes()); out.flush(); }
 
@@ -93,5 +100,5 @@ public class LteModemManager {
         }
     }
 
-    private void dispatchEvent(ModemEvent event){for(ModemEventListener l:listeners){try{l.onEvent(event);}catch(Exception e){e.printStackTrace();}}}
+    private void dispatchEvent(ModemEvent event){dispatcher.dispatch(event);}
 }
